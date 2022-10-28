@@ -1,7 +1,7 @@
 import functools
 import logging
 from datetime import datetime
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional, Union, TypeVar, Callable, Any
 
 from yandex_music import (
     Album,
@@ -55,12 +55,14 @@ de_list = {
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())
 
+F = TypeVar('F', bound=Callable[..., Any])
 
-def log(method):
+
+def log(method: F) -> F:
     logger = logging.getLogger(method.__module__)
 
     @functools.wraps(method)
-    def wrapper(*args, **kwargs):
+    def wrapper(*args, **kwargs) -> Any:
         logger.debug(f'Entering: {method.__name__}')
 
         result = method(*args, **kwargs)
@@ -1533,7 +1535,7 @@ class Client(YandexMusicObject):
             Для продолжения цепочки треков необходимо:
 
             1. Передавать `ID` трека, что был до этого (первый в цепочки).
-            2. Отправить фидбек о конче или скипе трека, что был передан в `queue`.
+            2. Отправить фидбек о конце или скипе трека, что был передан в `queue`.
             3. Отправить фидбек о начале следующего трека (второй в цепочки).
             4. Выполнить запрос получения треков. В ответе придёт новые треки или произойдёт сдвиг цепочки на 1 элемент.
 
